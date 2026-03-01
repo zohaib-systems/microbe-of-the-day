@@ -1,0 +1,119 @@
+.app-shell {
+  width: min(100%, 1100px);
+  margin: 0 auto;
+  padding: 2.25rem 1rem 2.5rem;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 1.8rem;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 2.6vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.title-icon {
+  font-size: 0.95em;
+}
+
+.hero p {
+  margin-top: 0.55rem;
+  color: #9ca3af;
+  font-size: 0.92rem;
+}
+
+.microbe-stack {
+  display: grid;
+  gap: 1rem;
+  width: min(100%, 500px);
+  margin: 0 auto;
+}
+
+.microbe-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+  animation: reveal-card 0.35s ease;
+  padding: 1rem;
+}
+
+.microbe-card-deinococcus {
+  border-color: #fecaca;
+  box-shadow: 0 10px 24px rgba(239, 68, 68, 0.14);
+}
+
+.microbe-image-container {
+  overflow: hidden;
+}
+
+.microbe-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.deinococcus-image {
+  object-position: center 35%;
+  filter: saturate(1.08) contrast(1.04);
+}
+
+.microbe-content {
+  padding-top: 1rem;
+}
+
+.microbe-name {
+  margin: 0;
+  font-size: 1.1rem;
+  font-style: italic;
+  letter-spacing: 1px;
+}
+
+.microbe-fact {
+  margin-top: 0.55rem;
+  color: #374151;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.1rem;
+}
+
+.reveal-btn {
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 0.65rem 1rem;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.reveal-btn:disabled {
+  background: #94a3b8;
+  cursor: default;
+}
+
+.secondary-btn {
+  background: #334155;
+}
+
+@keyframes reveal-card {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
