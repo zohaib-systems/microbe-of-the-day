@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import MicrobeCard from './components/MicrobeCard'
 import deinococcusImage from './assets/images/Deinococcus-radiodurans.webp'
 import halobacteriumImage from './assets/images/Halobacterium-salinarum.webp'
@@ -102,6 +103,7 @@ function App() {
         </button>
       </div>
       <Analytics />
+      <SpeedInsights />
     </main>
   )
 }
