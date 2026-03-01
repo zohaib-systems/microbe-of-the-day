@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import MicrobeCard from './components/MicrobeCard'
 import deinococcusImage from './assets/images/Deinococcus-radiodurans.webp'
 import halobacteriumImage from './assets/images/Halobacterium-salinarum.webp'
@@ -100,6 +101,7 @@ function App() {
           {hasMoreCards ? 'Next Microbe' : 'All cards revealed'}
         </button>
       </div>
+      <Analytics />
     </main>
   )
 }
