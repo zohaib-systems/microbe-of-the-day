@@ -36,19 +36,10 @@
 .microbe-card {
   border: 1px solid #e5e7eb;
   border-radius: 14px;
+  overflow: hidden;
   background: #ffffff;
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
   animation: reveal-card 0.35s ease;
-  padding: 1rem;
-}
-
-.microbe-card-deinococcus {
-  border-color: #fecaca;
-  box-shadow: 0 10px 24px rgba(239, 68, 68, 0.14);
-}
-
-.microbe-image-container {
-  overflow: hidden;
 }
 
 .microbe-image {
@@ -58,13 +49,8 @@
   display: block;
 }
 
-.deinococcus-image {
-  object-position: center 35%;
-  filter: saturate(1.08) contrast(1.04);
-}
-
 .microbe-content {
-  padding-top: 1rem;
+  padding: 1rem;
 }
 
 .microbe-name {

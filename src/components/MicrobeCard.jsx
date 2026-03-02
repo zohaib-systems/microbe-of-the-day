@@ -1,21 +1,7 @@
-function MicrobeCard({ id, image, name, fact, color }) {
-  const imageContainerStyle = {
-    borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
-    backgroundColor: color + '33',
-  }
-
+function MicrobeCard({ image, name, fact, color }) {
   return (
-    <article
-      className={`microbe-card ${id === 'deinococcus-radiodurans' ? 'microbe-card-deinococcus' : ''}`}
-    >
-      <div className="microbe-image-container" style={imageContainerStyle}>
-        <img
-          className={`microbe-image ${id === 'deinococcus-radiodurans' ? 'deinococcus-image' : ''}`}
-          src={image}
-          alt={name}
-          loading="lazy"
-        />
-      </div>
+    <article className="microbe-card">
+      <img className="microbe-image" src={image} alt={name} loading="lazy" />
       <div className="microbe-content">
         <h2 className="microbe-name">{name}</h2>
         <p className="microbe-fact">{fact}</p>

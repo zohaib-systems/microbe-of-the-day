@@ -74,7 +74,6 @@ function App() {
       <section className="microbe-stack" aria-label="Microbe cards">
         <MicrobeCard
           key={currentMicrobe.id}
-          id={currentMicrobe.id}
           image={currentMicrobe.image}
           name={currentMicrobe.name}
           fact={currentMicrobe.fact}
