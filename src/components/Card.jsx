@@ -11,11 +11,11 @@ function Card({ microbe, sectionKey, sectionLabel, isEnergized }) {
         className="h-40 w-full rounded-2xl object-cover"
       />
 
-      <h2 className="mt-4 text-xl font-semibold tracking-wide text-slate-900">
+      <h2 className="mt-4 text-xl font-bold tracking-wide text-slate-950">
         {microbe.name}
       </h2>
 
-      <p className="mt-1 text-xs uppercase tracking-[0.2em] text-slate-500">
+      <p className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">
         {sectionLabel}
       </p>
 
@@ -31,7 +31,7 @@ function Card({ microbe, sectionKey, sectionLabel, isEnergized }) {
           }}
           exit={{ opacity: 0, y: -6, filter: 'blur(4px)' }}
           transition={{ duration: 0.35, ease: 'easeOut' }}
-          className="mt-3 min-h-[92px] text-sm leading-relaxed text-slate-700"
+          className="mt-3 min-h-[92px] text-base font-medium leading-relaxed text-slate-800"
         >
           {microbe[sectionKey]}
         </motion.p>

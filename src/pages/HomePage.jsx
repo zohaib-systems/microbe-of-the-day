@@ -3,6 +3,7 @@ import { animate, motion } from 'framer-motion'
 import Card from '../components/Card'
 import CategoryButton from '../components/CategoryButton'
 import { microbeOfDay } from '../data/microbeData'
+import dashboardBackground from '../assets/images/Background.webp'
 
 const HUB_WIDTH = 900
 const HUB_HEIGHT = 620
@@ -206,7 +207,14 @@ function HomePage() {
             className="relative overflow-hidden rounded-[36px] border border-cyan-300/20 bg-white/[0.03] shadow-[0_0_50px_rgba(14,165,233,0.15)] backdrop-blur-md"
             style={{ width: HUB_WIDTH, height: HUB_HEIGHT }}
           >
-            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(56,189,248,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(56,189,248,0.08)_1px,transparent_1px)] bg-[size:40px_40px]" />
+            <div
+              className="pointer-events-none absolute inset-0 opacity-25"
+              style={{
+                backgroundImage: `url(${dashboardBackground})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            />
 
             <svg
               className="pointer-events-none absolute inset-0"
