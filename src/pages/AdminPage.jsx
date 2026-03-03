@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
+const STORAGE_KEY = 'microbe_schedule_v1'
+
 function AdminPage() {
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
@@ -38,7 +40,31 @@ function AdminPage() {
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    setMessage('Saved locally. Connect this form to your backend or API next.')
+
+    if (!formData.name.trim() || !formData.date) {
+      setMessage('Please add at least a microbe name and date.')
+      return
+    }
+
+    const image = formData.imageData || formData.imageUrl
+
+    if (!image) {
+      setMessage('Please add an image URL or upload an image file.')
+      return
+    }
+
+    const savedSchedule = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')
+    savedSchedule[formData.date] = {
+      name: formData.name.trim(),
+      image,
+      history: formData.history.trim(),
+      pathogenesis: formData.pathogenesis.trim(),
+      biotech: formData.biotech.trim(),
+      industrial: formData.industrial.trim(),
+    }
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedSchedule))
+    setMessage(`Saved for ${formData.date}. It will appear automatically on that date.`)
   }
 
   const handleLogout = () => {

@@ -5,6 +5,8 @@ import CategoryButton from '../components/CategoryButton'
 import { microbeOfDay } from '../data/microbeData'
 import dashboardBackground from '../assets/images/Background.webp'
 
+const STORAGE_KEY = 'microbe_schedule_v1'
+
 const HUB_WIDTH = 900
 const HUB_HEIGHT = 620
 const CENTER_X = HUB_WIDTH / 2
@@ -97,6 +99,7 @@ const pointOnPolyline = (points, progress) => {
 }
 
 function HomePage() {
+  const [currentMicrobe, setCurrentMicrobe] = useState(microbeOfDay)
   const [activeSection, setActiveSection] = useState('name')
   const [activeTrace, setActiveTrace] = useState(null)
   const [pulseState, setPulseState] = useState(null)
@@ -134,6 +137,18 @@ function HomePage() {
   }, [])
 
   useEffect(() => {
+    const now = new Date()
+    const todayDateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+    const schedule = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')
+    const scheduledMicrobe = schedule[todayDateKey]
+
+    if (scheduledMicrobe) {
+      setCurrentMicrobe({
+        ...microbeOfDay,
+        ...scheduledMicrobe,
+      })
+    }
+
     return () => {
       animationRef.current?.stop()
       clearTimeout(impactTimeoutRef.current)
@@ -288,7 +303,7 @@ function HomePage() {
 
             <div className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2">
               <Card
-                microbe={microbeOfDay}
+                microbe={currentMicrobe}
                 sectionKey={activeSection}
                 isEnergized={isCardEnergized}
                 sectionLabel={traces.find((trace) => trace.key === activeSection)?.label || 'Name'}
