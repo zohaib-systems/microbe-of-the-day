@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { ADMIN_LOGIN_PATH } from '../config/adminRoute'
 
 const STORAGE_KEY = 'microbe_schedule_v1'
 
@@ -69,7 +70,7 @@ function AdminPage() {
 
   const handleLogout = () => {
     localStorage.removeItem('microbe_admin_auth')
-    navigate('/admin-login', { replace: true })
+    navigate(ADMIN_LOGIN_PATH, { replace: true })
   }
 
   return (

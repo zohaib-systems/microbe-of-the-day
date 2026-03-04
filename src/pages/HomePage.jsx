@@ -277,7 +277,7 @@ function HomePage() {
           </div>
         </header>
 
-        <section className="mt-6 rounded-3xl border border-cyan-300/15 bg-white/[0.03] p-3 shadow-[0_0_24px_rgba(14,165,233,0.06)] sm:p-5" aria-label="Microbe hub dashboard">
+        <section className="mt-4 rounded-3xl border border-cyan-300/15 bg-white/[0.03] p-3 shadow-[0_0_24px_rgba(14,165,233,0.06)] sm:mt-5 sm:p-5" aria-label="Microbe hub dashboard">
           {isMobileLayout ? (
             <div className="space-y-4">
               <Card

@@ -5,13 +5,15 @@ import HomePage from './pages/HomePage'
 import AdminPage from './pages/AdminPage'
 import AdminLoginPage from './pages/AdminLoginPage'
 import ProtectedRoute from './components/ProtectedRoute'
+import { ADMIN_LOGIN_PATH } from './config/adminRoute'
 
 function App() {
   return (
     <>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/admin-login" element={<AdminLoginPage />} />
+        <Route path={ADMIN_LOGIN_PATH} element={<AdminLoginPage />} />
+        <Route path="/admin-login" element={<Navigate to="/" replace />} />
         <Route
           path="/admin"
           element={
