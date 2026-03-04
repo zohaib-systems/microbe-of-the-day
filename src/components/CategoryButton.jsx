@@ -12,13 +12,13 @@ function CategoryButton({
       type="button"
       onClick={onClick}
       disabled={isPulseRunning}
-      className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-xl border px-2.5 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-medium uppercase tracking-[0.08em] sm:tracking-[0.14em] text-white shadow-lg transition ${isActive ? 'scale-105' : 'scale-100'} ${isPulseRunning ? 'cursor-wait opacity-75' : 'hover:scale-105'}`}
+      className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-xl border px-3 py-2 sm:px-4 sm:py-2 text-[11px] sm:text-xs font-medium uppercase tracking-[0.08em] sm:tracking-[0.12em] text-white shadow-lg transition ${isActive ? 'scale-105' : 'scale-100'} ${isPulseRunning ? 'cursor-wait opacity-75' : 'hover:scale-105'}`}
       style={{
         left: `${x}px`,
         top: `${y}px`,
-        borderColor: `${color}AA`,
-        background: `linear-gradient(145deg, ${color}66, #0b1226CC)`,
-        boxShadow: `0 0 20px ${color}66`,
+        borderColor: `${color}80`,
+        background: `linear-gradient(145deg, ${color}4A, #0b1226B5)`,
+        boxShadow: `0 0 12px ${color}44`,
       }}
     >
       {label}
