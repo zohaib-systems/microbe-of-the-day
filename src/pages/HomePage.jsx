@@ -7,15 +7,11 @@ import dashboardBackground from '../assets/images/Background.webp'
 
 const STORAGE_KEY = 'microbe_schedule_v1'
 
-const HUB_WIDTH = 900
-const HUB_HEIGHT = 620
-const CENTER_X = HUB_WIDTH / 2
-const CENTER_Y = HUB_HEIGHT / 2
-const CARD_WIDTH = 330
-const CARD_LEFT = CENTER_X - CARD_WIDTH / 2
-const CARD_RIGHT = CENTER_X + CARD_WIDTH / 2
-const EDGE_APPROACH_DISTANCE = 80
-const BUTTON_NORMAL_OFFSET = 90
+const BASE_HUB_WIDTH = 900
+const BASE_HUB_HEIGHT = 620
+const BASE_CARD_WIDTH = 330
+const BASE_EDGE_APPROACH_DISTANCE = 80
+const BASE_BUTTON_NORMAL_OFFSET = 90
 const PULSE_DURATION_SECONDS = 0.8
 
 const traceBlueprint = [
@@ -104,21 +100,35 @@ function HomePage() {
   const [activeTrace, setActiveTrace] = useState(null)
   const [pulseState, setPulseState] = useState(null)
   const [isCardEnergized, setIsCardEnergized] = useState(false)
+  const [viewportWidth, setViewportWidth] = useState(
+    typeof window !== 'undefined' ? window.innerWidth : 1280
+  )
   const animationRef = useRef(null)
   const impactTimeoutRef = useRef(null)
 
+  const hubWidth = Math.min(BASE_HUB_WIDTH, Math.max(320, viewportWidth - 24))
+  const scale = hubWidth / BASE_HUB_WIDTH
+  const hubHeight = BASE_HUB_HEIGHT * scale
+  const centerX = hubWidth / 2
+  const centerY = hubHeight / 2
+  const cardWidth = BASE_CARD_WIDTH * scale
+  const cardLeft = centerX - cardWidth / 2
+  const cardRight = centerX + cardWidth / 2
+  const edgeApproachDistance = BASE_EDGE_APPROACH_DISTANCE * scale
+  const buttonNormalOffset = BASE_BUTTON_NORMAL_OFFSET * scale
+
   const traces = useMemo(() => {
     return traceBlueprint.map((trace) => {
-      const targetY = CENTER_Y + trace.entryOffsetY
+      const targetY = centerY + trace.entryOffsetY * scale
       const button = {
         x:
           trace.entrySide === 'right'
-            ? CARD_RIGHT + EDGE_APPROACH_DISTANCE + BUTTON_NORMAL_OFFSET
-            : CARD_LEFT - EDGE_APPROACH_DISTANCE - BUTTON_NORMAL_OFFSET,
+            ? cardRight + edgeApproachDistance + buttonNormalOffset
+            : cardLeft - edgeApproachDistance - buttonNormalOffset,
         y: targetY,
       }
       const contact = {
-        x: trace.entrySide === 'right' ? CARD_RIGHT : CARD_LEFT,
+        x: trace.entrySide === 'right' ? cardRight : cardLeft,
         y: targetY,
       }
       const routePoints = [button, contact]
@@ -134,9 +144,22 @@ function HomePage() {
         contact,
       }
     })
-  }, [])
+  }, [
+    scale,
+    centerY,
+    cardLeft,
+    cardRight,
+    edgeApproachDistance,
+    buttonNormalOffset,
+  ])
 
   useEffect(() => {
+    const onResize = () => {
+      setViewportWidth(window.innerWidth)
+    }
+
+    window.addEventListener('resize', onResize)
+
     const now = new Date()
     const todayDateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
     const schedule = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')
@@ -150,6 +173,7 @@ function HomePage() {
     }
 
     return () => {
+      window.removeEventListener('resize', onResize)
       animationRef.current?.stop()
       clearTimeout(impactTimeoutRef.current)
     }
@@ -208,7 +232,7 @@ function HomePage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 bg-[radial-gradient(circle_at_center,_#111b32_0%,_#050913_55%,_#02040a_100%)] p-6 text-white">
+    <main className="min-h-screen bg-slate-950 bg-[radial-gradient(circle_at_center,_#111b32_0%,_#050913_55%,_#02040a_100%)] p-3 sm:p-6 text-white">
       <div className="mx-auto max-w-7xl">
         <h1 className="text-center text-3xl font-bold tracking-[0.14em] md:text-4xl">
           Microbe of the Day
@@ -219,95 +243,112 @@ function HomePage() {
 
         <section className="mt-8 flex justify-center" aria-label="Microbe hub dashboard">
           <div
-            className="relative overflow-hidden rounded-[36px] border border-cyan-300/20 bg-white/[0.03] shadow-[0_0_50px_rgba(14,165,233,0.15)] backdrop-blur-md"
-            style={{ width: HUB_WIDTH, height: HUB_HEIGHT }}
+            className="relative w-full"
+            style={{
+              width: hubWidth,
+              height: hubHeight,
+            }}
           >
             <div
-              className="pointer-events-none absolute inset-0 opacity-25"
+              className="relative overflow-hidden rounded-[36px] border border-cyan-300/20 bg-white/[0.03] shadow-[0_0_50px_rgba(14,165,233,0.15)] backdrop-blur-md"
               style={{
-                backgroundImage: `url(${dashboardBackground})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
+                width: hubWidth,
+                height: hubHeight,
               }}
-            />
-
-            <svg
-              className="pointer-events-none absolute inset-0"
-              width={HUB_WIDTH}
-              height={HUB_HEIGHT}
             >
-              {traces.map((trace) => (
-                <g key={`trace-${trace.key}`}>
-                  <path
-                    d={trace.path}
-                    stroke={trace.color}
-                    strokeOpacity="0.22"
-                    strokeWidth="2.3"
-                    strokeLinecap="round"
-                    fill="none"
-                  />
+              <div
+                className="pointer-events-none absolute inset-0 opacity-25"
+                style={{
+                  backgroundImage: `url(${dashboardBackground})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }}
+              />
 
-                  {activeTrace === trace.key && pulseState && (
+              <svg
+                className="pointer-events-none absolute inset-0"
+                width={hubWidth}
+                height={hubHeight}
+              >
+                {traces.map((trace) => (
+                  <g key={`trace-${trace.key}`}>
                     <path
                       d={trace.path}
                       stroke={trace.color}
-                      strokeWidth="3"
+                      strokeOpacity="0.22"
+                      strokeWidth="2.3"
                       strokeLinecap="round"
                       fill="none"
-                      style={{
-                        filter: `drop-shadow(0 0 8px ${trace.color})`,
-                        strokeDasharray: `${trace.length * pulseState.progress} ${trace.length}`,
-                        strokeDashoffset: 0,
-                      }}
                     />
-                  )}
-                </g>
+
+                    {activeTrace === trace.key && pulseState && (
+                      <path
+                        d={trace.path}
+                        stroke={trace.color}
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        fill="none"
+                        style={{
+                          filter: `drop-shadow(0 0 8px ${trace.color})`,
+                          strokeDasharray: `${trace.length * pulseState.progress} ${trace.length}`,
+                          strokeDashoffset: 0,
+                        }}
+                      />
+                    )}
+                  </g>
+                ))}
+
+                <circle
+                  cx={centerX}
+                  cy={centerY}
+                  r={8 * scale}
+                  fill="none"
+                  stroke="#67e8f9"
+                  strokeOpacity="0.8"
+                  strokeWidth={2 * scale}
+                />
+              </svg>
+
+              {traces.map((trace) => (
+                <CategoryButton
+                  key={trace.key}
+                  label={trace.label}
+                  color={trace.color}
+                  x={trace.button.x}
+                  y={trace.button.y}
+                  isActive={activeSection === trace.key}
+                  isPulseRunning={Boolean(activeTrace)}
+                  onClick={() => launchPulse(trace)}
+                />
               ))}
 
-              <circle
-                cx={CENTER_X}
-                cy={CENTER_Y}
-                r="8"
-                fill="none"
-                stroke="#67e8f9"
-                strokeOpacity="0.8"
-                strokeWidth="2"
-              />
-            </svg>
+              {pulseState && (
+                <motion.div
+                  className={`pointer-events-none absolute z-30 ${pulseState.side === 'right' ? 'rotate-180' : ''}`}
+                  style={{
+                    width: 3 * Math.max(0.8, scale),
+                    height: 6 * Math.max(0.8, scale),
+                    left:
+                      pulseState.side === 'right'
+                        ? pulseState.x - 2 * Math.max(0.8, scale)
+                        : pulseState.x - 10 * Math.max(0.8, scale),
+                    top: pulseState.y - 11 * Math.max(0.8, scale),
+                    background: pulseState.color,
+                    clipPath: 'polygon(50% 0%, 12% 46%, 36% 46%, 16% 100%, 88% 40%, 58% 40%)',
+                    filter: `drop-shadow(0 0 6px ${pulseState.color}) drop-shadow(0 0 14px ${pulseState.color})`,
+                  }}
+                />
+              )}
 
-            {traces.map((trace) => (
-              <CategoryButton
-                key={trace.key}
-                label={trace.label}
-                color={trace.color}
-                x={trace.button.x}
-                y={trace.button.y}
-                isActive={activeSection === trace.key}
-                isPulseRunning={Boolean(activeTrace)}
-                onClick={() => launchPulse(trace)}
-              />
-            ))}
-
-            {pulseState && (
-              <motion.div
-                className={`pointer-events-none absolute z-30 h-6 w-3 ${pulseState.side === 'right' ? 'rotate-180' : ''}`}
-                style={{
-                  left: pulseState.side === 'right' ? pulseState.x - 2 : pulseState.x - 10,
-                  top: pulseState.y - 11,
-                  background: pulseState.color,
-                  clipPath: 'polygon(50% 0%, 12% 46%, 36% 46%, 16% 100%, 88% 40%, 58% 40%)',
-                  filter: `drop-shadow(0 0 6px ${pulseState.color}) drop-shadow(0 0 14px ${pulseState.color})`,
-                }}
-              />
-            )}
-
-            <div className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2">
-              <Card
-                microbe={currentMicrobe}
-                sectionKey={activeSection}
-                isEnergized={isCardEnergized}
-                sectionLabel={traces.find((trace) => trace.key === activeSection)?.label || 'Name'}
-              />
+              <div className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2">
+                <Card
+                  microbe={currentMicrobe}
+                  width={cardWidth}
+                  sectionKey={activeSection}
+                  isEnergized={isCardEnergized}
+                  sectionLabel={traces.find((trace) => trace.key === activeSection)?.label || 'Name'}
+                />
+              </div>
             </div>
           </div>
         </section>
