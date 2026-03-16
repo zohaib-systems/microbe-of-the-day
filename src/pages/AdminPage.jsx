@@ -2,8 +2,6 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ADMIN_LOGIN_PATH } from '../config/adminRoute'
 
-const STORAGE_KEY = 'microbe_schedule_v1'
-
 function AdminPage() {
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
@@ -39,7 +37,7 @@ function AdminPage() {
     reader.readAsDataURL(file)
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
 
     if (!formData.name.trim() || !formData.date) {
@@ -54,9 +52,9 @@ function AdminPage() {
       return
     }
 
-    const savedSchedule = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')
-    savedSchedule[formData.date] = {
+    const microbeData = {
       name: formData.name.trim(),
+      date: formData.date,
       image,
       history: formData.history.trim(),
       pathogenesis: formData.pathogenesis.trim(),
@@ -64,8 +62,25 @@ function AdminPage() {
       industrial: formData.industrial.trim(),
     }
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedSchedule))
-    setMessage(`Saved for ${formData.date}. It will appear automatically on that date.`)
+    try {
+      const response = await fetch('/api/microbes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(microbeData),
+      })
+
+      if (response.ok) {
+        setMessage(`Saved microbe for ${formData.date}. The data is now available to all users.`)
+      } else {
+        const errorData = await response.json()
+        setMessage(`Error: ${errorData.message || 'Failed to save microbe.'}`)
+      }
+    } catch (error) {
+      console.error('Failed to save microbe:', error)
+      setMessage('An unexpected error occurred. Please try again.')
+    }
   }
 
   const handleLogout = () => {

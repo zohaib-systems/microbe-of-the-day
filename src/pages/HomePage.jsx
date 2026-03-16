@@ -2,8 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { animate } from 'framer-motion'
 import Card from '../components/Card'
 import CategoryButton from '../components/CategoryButton'
-import { microbeOfDay } from '../data/microbeData'
-import dashboardBackground from '../assets/images/Background.webp'
+import Search from '../components/Search'
 
 const STORAGE_KEY = 'microbe_schedule_v1'
 
@@ -12,7 +11,7 @@ const BASE_HUB_HEIGHT = 620
 const BASE_CARD_WIDTH = 330
 const BASE_EDGE_APPROACH_DISTANCE = 64
 const BASE_BUTTON_NORMAL_OFFSET = 86
-const PULSE_DURATION_SECONDS = 0.8
+const PULSE_DURATION_SECONDS = 1.2
 
 const traceBlueprint = [
   {
@@ -47,26 +46,6 @@ const traceBlueprint = [
 
 const buildPath = (points) =>
   points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`).join(' ')
-
-const getScheduledMicrobeForToday = () => {
-  if (typeof window === 'undefined') {
-    return microbeOfDay
-  }
-
-  const now = new Date()
-  const todayDateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
-  const schedule = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')
-  const scheduledMicrobe = schedule[todayDateKey]
-
-  if (!scheduledMicrobe) {
-    return microbeOfDay
-  }
-
-  return {
-    ...microbeOfDay,
-    ...scheduledMicrobe,
-  }
-}
 
 const calculateLength = (points) => {
   let total = 0
@@ -114,8 +93,26 @@ const pointOnPolyline = (points, progress) => {
   return points[points.length - 1]
 }
 
+const SkeletonCard = ({ width }) => (
+  <div
+    className="relative rounded-3xl border border-white/20 bg-white/50 p-4 sm:p-6 shadow-[0_14px_32px_rgba(15,23,42,0.2)] backdrop-blur-md"
+    style={{ width }}
+  >
+    <div className="animate-pulse">
+      <div className="h-36 w-full rounded-2xl bg-slate-300 sm:h-44"></div>
+      <div className="mt-4 h-6 w-3/4 rounded bg-slate-300"></div>
+      <div className="mt-2 h-4 w-1/2 rounded bg-slate-300"></div>
+      <div className="mt-3 space-y-2">
+        <div className="h-4 rounded bg-slate-300"></div>
+        <div className="h-4 rounded bg-slate-300"></div>
+        <div className="h-4 w-5/6 rounded bg-slate-300"></div>
+      </div>
+    </div>
+  </div>
+)
+
 function HomePage() {
-  const [currentMicrobe] = useState(() => getScheduledMicrobeForToday())
+  const [currentMicrobe, setCurrentMicrobe] = useState(null)
   const [activeSection, setActiveSection] = useState('name')
   const [activeTrace, setActiveTrace] = useState(null)
   const [pulseState, setPulseState] = useState(null)
@@ -196,6 +193,20 @@ function HomePage() {
     }
   }, [])
 
+  useEffect(() => {
+    const fetchMicrobe = async () => {
+      try {
+        const response = await fetch('/api/microbes/today');
+        const data = await response.json();
+        setCurrentMicrobe(data);
+      } catch (error) {
+        console.error('Failed to fetch microbe of the day:', error);
+      }
+    };
+
+    fetchMicrobe();
+  }, []);
+
   const launchPulse = (trace) => {
     if (isMobileLayout) {
       setActiveSection(trace.key)
@@ -270,23 +281,33 @@ function HomePage() {
               <h1 className="mt-2 text-2xl font-bold tracking-[0.08em] sm:text-3xl sm:tracking-[0.12em]">
                 Microbe of the Day
               </h1>
-              <p className="mt-2 max-w-xl text-[15px] leading-7 text-slate-300">
-                Select a category to inspect a focused insight for today&apos;s microbe profile.
+              <p className="mx-auto mt-2 max-w-xl text-[15px] leading-7 text-slate-300">
+                Select a category to inspect a focused insight for today's microbe profile.
               </p>
+              <div className="mx-auto mt-4 max-w-md">
+                <Search onMicrobeSelect={setCurrentMicrobe} />
+              </div>
             </div>
           </div>
         </header>
 
-        <section className="mt-4 rounded-3xl border border-cyan-300/15 bg-white/[0.03] p-3 shadow-[0_0_24px_rgba(14,165,233,0.06)] sm:mt-5 sm:p-5" aria-label="Microbe hub dashboard">
+        <section
+          className="mt-4 rounded-3xl border border-cyan-300/15 bg-white/[0.03] p-3 shadow-[0_0_24px_rgba(14,165,233,0.06)] sm:mt-5 sm:p-5"
+          aria-label="Microbe hub dashboard"
+        >
           {isMobileLayout ? (
             <div className="space-y-4">
-              <Card
-                microbe={currentMicrobe}
-                width="100%"
-                sectionKey={activeSection}
-                isEnergized={isCardEnergized}
-                sectionLabel={traces.find((trace) => trace.key === activeSection)?.label || 'Name'}
-              />
+              {currentMicrobe ? (
+                <Card
+                  microbe={currentMicrobe}
+                  width="100%"
+                  sectionKey={activeSection}
+                  isEnergized={isCardEnergized}
+                  sectionLabel={traces.find((trace) => trace.key === activeSection)?.label || 'Name'}
+                />
+              ) : (
+                <SkeletonCard width="100%" />
+              )}
 
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {traces.map((trace) => (
@@ -294,7 +315,11 @@ function HomePage() {
                     key={trace.key}
                     type="button"
                     onClick={() => launchPulse(trace)}
-                    className={`rounded-xl border px-3 py-3 text-left text-sm font-semibold transition ${activeSection === trace.key ? 'border-cyan-200/55 bg-cyan-300/15 text-cyan-50 shadow-[0_0_12px_rgba(34,211,238,0.28)]' : 'border-cyan-300/25 bg-slate-900/70 text-slate-100 hover:border-cyan-200/45 hover:bg-slate-800/70'}`}
+                    className={`rounded-xl border px-3 py-3 text-left text-sm font-semibold transition ${
+                      activeSection === trace.key
+                        ? 'border-cyan-200/55 bg-cyan-300/15 text-cyan-50 shadow-[0_0_12px_rgba(34,211,238,0.28)]'
+                        : 'border-cyan-300/25 bg-slate-900/70 text-slate-100 hover:border-cyan-200/45 hover:bg-slate-800/70'
+                    }`}
                   >
                     {trace.label}
                   </button>
@@ -312,7 +337,7 @@ function HomePage() {
               <div
                 className="pointer-events-none absolute inset-0 opacity-18"
                 style={{
-                  backgroundImage: `url(${dashboardBackground})`,
+                  backgroundImage: `url('/assets/images/Background.webp')`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                 }}
@@ -339,12 +364,14 @@ function HomePage() {
                       <path
                         d={trace.path}
                         stroke={trace.color}
-                        strokeWidth="2.6"
+                        strokeWidth="3"
                         strokeLinecap="round"
                         fill="none"
                         style={{
-                          filter: `drop-shadow(0 0 5px ${trace.color})`,
-                          strokeDasharray: `${trace.length * pulseState.progress} ${trace.length}`,
+                          filter: `drop-shadow(0 0 10px ${trace.color})`,
+                          strokeDasharray: `${trace.length * pulseState.progress} ${
+                            trace.length
+                          }`,
                           strokeDashoffset: 0,
                         }}
                       />
@@ -380,25 +407,31 @@ function HomePage() {
                 <div
                   className="pointer-events-none absolute z-30"
                   style={{
-                    width: 7 * Math.max(0.75, visualScale),
-                    height: 7 * Math.max(0.75, visualScale),
-                    left: pulseState.x - 3.5 * Math.max(0.75, visualScale),
-                    top: pulseState.y - 3.5 * Math.max(0.75, visualScale),
+                    width: 10 * Math.max(0.75, visualScale),
+                    height: 10 * Math.max(0.75, visualScale),
+                    left: pulseState.x - 5 * Math.max(0.75, visualScale),
+                    top: pulseState.y - 5 * Math.max(0.75, visualScale),
                     borderRadius: '9999px',
                     background: pulseState.color,
-                    boxShadow: `0 0 0 5px ${pulseState.color}22`,
+                    boxShadow: `0 0 12px 6px ${pulseState.color}55`,
                   }}
                 />
               )}
 
               <div className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2">
-                <Card
-                  microbe={currentMicrobe}
-                  width={cardWidth}
-                  sectionKey={activeSection}
-                  isEnergized={isCardEnergized}
-                  sectionLabel={traces.find((trace) => trace.key === activeSection)?.label || 'Name'}
-                />
+                {currentMicrobe ? (
+                  <Card
+                    microbe={currentMicrobe}
+                    width={cardWidth}
+                    sectionKey={activeSection}
+                    isEnergized={isCardEnergized}
+                    sectionLabel={
+                      traces.find((trace) => trace.key === activeSection)?.label || 'Name'
+                    }
+                  />
+                ) : (
+                  <SkeletonCard width={cardWidth} />
+                )}
               </div>
             </div>
           )}
