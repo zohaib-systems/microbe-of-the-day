@@ -65,7 +65,9 @@ function AdminPage() {
     }
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(savedSchedule))
-    setMessage(`Saved for ${formData.date}. It will appear automatically on that date.`)
+    setMessage(
+      `Saved for ${formData.date}. The data is saved locally in this browser and will override the default microbe on that date.`
+    )
   }
 
   const handleLogout = () => {
@@ -158,7 +160,7 @@ function AdminPage() {
             className="sm:col-span-2 min-h-24 rounded-xl border border-white/20 bg-slate-900/75 px-3 py-2.5 outline-none transition focus:border-cyan-300"
             placeholder="Industrial Importance"
             value={formData.industrial}
-            onChange={(event) => updateField('industrial', event.target.value)}
+            onChange={(event) => updateField('industrial', event.targe.value)}
           />
 
           <button

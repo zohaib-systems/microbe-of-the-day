@@ -7,13 +7,16 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server": "node server/index.cjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.1",
-    "framer-motion": "^12.34.3",
     "@vercel/analytics": "^1.6.1",
-    "@vercel/speed-insights": "^1.3.1",
+    "@vercel/speed-insighs": "^1.3.1",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "framer-motion": "^12.34.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.1",
