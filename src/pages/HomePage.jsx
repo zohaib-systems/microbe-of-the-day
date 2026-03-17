@@ -4,8 +4,6 @@ import Card from '../components/Card'
 import CategoryButton from '../components/CategoryButton'
 import Search from '../components/Search'
 
-const STORAGE_KEY = 'microbe_schedule_v1'
-
 const BASE_HUB_WIDTH = 900
 const BASE_HUB_HEIGHT = 620
 const BASE_CARD_WIDTH = 330
@@ -196,9 +194,14 @@ function HomePage() {
   useEffect(() => {
     const fetchMicrobe = async () => {
       try {
-        const response = await fetch('/api/microbes/today');
-        const data = await response.json();
-        setCurrentMicrobe(data);
+        const today = new Date().toISOString().split('T')[0];
+        const response = await fetch(`/api/microbes/today?date=${today}`);
+        if (response.ok) {
+          const data = await response.json();
+          setCurrentMicrobe(data);
+        } else {
+          console.error('Failed to fetch microbe of the day:', response.statusText);
+        }
       } catch (error) {
         console.error('Failed to fetch microbe of the day:', error);
       }

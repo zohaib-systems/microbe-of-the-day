@@ -10,8 +10,12 @@ const Search = ({ onMicrobeSelect }) => {
     const fetchAllMicrobes = async () => {
       try {
         const response = await fetch('/api/microbes');
-        const data = await response.json();
-        setAllMicrobes(data);
+        if (response.ok) {
+          const data = await response.json();
+          setAllMicrobes(data);
+        } else {
+          console.error('Failed to fetch all microbes:', response.statusText);
+        }
       } catch (error) {
         console.error('Failed to fetch all microbes:', error);
       }
