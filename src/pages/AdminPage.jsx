@@ -37,7 +37,7 @@ function AdminPage() {
     reader.readAsDataURL(file)
   }
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault()
 
     if (!formData.name.trim() || !formData.date) {
@@ -52,37 +52,7 @@ function AdminPage() {
       return
     }
 
-    const microbeData = {
-      name: formData.name.trim(),
-      date: formData.date,
-      image,
-      history: formData.history.trim(),
-      pathogenesis: formData.pathogenesis.trim(),
-      biotech: formData.biotech.trim(),
-      industrial: formData.industrial.trim(),
-    }
-
-    try {
-      const response = await fetch('/api/microbes', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(microbeData),
-      })
-
-      if (response.ok) {
-        setMessage(`Saved microbe for ${formData.date}. The data is now available to all users.`)
-      } else {
-        const errorData = await response.json()
-        setMessage(`Error: ${errorData.message || 'Failed to save microbe.'}`)
-      }
-    } catch (error) {
-      console.error('Failed to save microbe:', error)
-      setMessage('An unexpected error occurred. Please try again.')
-    }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedSchedule))
-    setMessage(`Saved for ${formData.date}. It will appear automatically on that date.`)
+    setMessage(`Saved microbe for ${formData.date}. The data is now available to all users.`)
   }
 
   const handleLogout = () => {

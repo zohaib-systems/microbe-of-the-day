@@ -46,26 +46,6 @@ const traceBlueprint = [
 const buildPath = (points) =>
   points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`).join(' ')
 
-const getScheduledMicrobeForToday = () => {
-  if (typeof window === 'undefined') {
-    return microbeOfDay
-  }
-
-  const now = new Date()
-  const todayDateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
-  const schedule = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')
-  const scheduledMicrobe = schedule[todayDateKey]
-
-  if (!scheduledMicrobe) {
-    return microbeOfDay
-  }
-
-  return {
-    ...microbeOfDay,
-    ...scheduledMicrobe,
-  }
-}
-
 const calculateLength = (points) => {
   let total = 0
 
@@ -113,7 +93,7 @@ const pointOnPolyline = (points, progress) => {
 }
 
 function HomePage() {
-  const [currentMicrobe] = useState(() => getScheduledMicrobeForToday())
+  const [currentMicrobe] = useState(microbeOfDay)
   const [activeSection, setActiveSection] = useState('name')
   const [activeTrace, setActiveTrace] = useState(null)
   const [pulseState, setPulseState] = useState(null)
@@ -193,25 +173,6 @@ function HomePage() {
       clearTimeout(impactTimeoutRef.current)
     }
   }, [])
-
-  useEffect(() => {
-    const fetchMicrobe = async () => {
-      try {
-        const today = new Date().toISOString().split('T')[0];
-        const response = await fetch(`/api/microbes/today?date=${today}`);
-        if (response.ok) {
-          const data = await response.json();
-          setCurrentMicrobe(data);
-        } else {
-          console.error('Failed to fetch microbe of the day:', response.statusText);
-        }
-      } catch (error) {
-        console.error('Failed to fetch microbe of the day:', error);
-      }
-    };
-
-    fetchMicrobe();
-  }, []);
 
   const launchPulse = (trace) => {
     if (isMobileLayout) {
