@@ -81,6 +81,8 @@ function AdminPage() {
       console.error('Failed to save microbe:', error)
       setMessage('An unexpected error occurred. Please try again.')
     }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedSchedule))
+    setMessage(`Saved for ${formData.date}. It will appear automatically on that date.`)
   }
 
   const handleLogout = () => {

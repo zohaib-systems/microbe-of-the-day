@@ -1,25 +1,14 @@
-import { useState, useEffect } from 'react';
-
 function Card({ microbe, sectionKey, sectionLabel, isEnergized, width }) {
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
-
-  useEffect(() => {
-    setIsImageLoaded(false);
-  }, [microbe.image]);
-
   return (
     <article
       className={`relative rounded-3xl border border-white/20 bg-white/92 p-4 sm:p-6 shadow-[0_14px_32px_rgba(15,23,42,0.2)] backdrop-blur-md transition-all duration-300 ${isEnergized ? 'ring-1 ring-white/70 shadow-[0_0_22px_rgba(255,255,255,0.45)]' : ''}`}
       style={{ width }}
     >
-      <div className="h-36 sm:h-44 w-full rounded-2xl bg-slate-300 overflow-hidden">
-        <img
-          src={microbe.image}
-          alt={microbe.name}
-          onLoad={() => setIsImageLoaded(true)}
-          className={`h-full w-full object-cover rounded-2xl transition-all duration-700 ease-in-out ${isImageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'}`}
-        />
-      </div>
+      <img
+        src={microbe.image}
+        alt={microbe.name}
+        className="h-36 sm:h-44 w-full rounded-2xl object-cover"
+      />
 
       <h2 className="mt-4 text-lg sm:text-xl font-semibold tracking-tight text-slate-950">
         {microbe.name}
