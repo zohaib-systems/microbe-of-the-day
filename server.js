@@ -12,7 +12,15 @@ const PORT = process.env.PORT || 3001;
 const DATA_FILE = path.join(__dirname, 'data', 'microbes.json');
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+
+// Logging middleware
+app.use((req, res, next) => {
+    if (req.method !== 'GET') {
+        console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    }
+    next();
+});
 
 // Serve static files from the React app build folder
 const __distPath = path.join(__dirname, 'dist');
@@ -54,27 +62,32 @@ app.get('/api/today', async (req, res) => {
 
 // POST new microbe
 app.post('/api/microbes', async (req, res) => {
-    const newMicrobe = {
-        id: Date.now().toString(),
-        ...req.body
-    };
-    const microbes = await readData();
-    
-    // Check if entry for this date already exists and update it, otherwise add new
-    const existingIndex = microbes.findIndex(m => m.date === newMicrobe.date);
-    if (existingIndex > -1) {
-        // Preserve existing likes if updating
-        newMicrobe.likes = microbes[existingIndex].likes || 0;
-        microbes[existingIndex] = newMicrobe;
-    } else {
-        newMicrobe.likes = 0; // Initialize new microbe with 0 likes
-        microbes.push(newMicrobe);
-        // Sort by date descending
-        microbes.sort((a, b) => new Date(b.date) - new Date(a.date));
-    }
+    try {
+        const newMicrobe = {
+            id: Date.now().toString(),
+            ...req.body
+        };
+        const microbes = await readData();
+        
+        // Check if entry for this date already exists and update it, otherwise add new
+        const existingIndex = microbes.findIndex(m => m.date === newMicrobe.date);
+        if (existingIndex > -1) {
+            // Preserve existing likes if updating
+            newMicrobe.likes = microbes[existingIndex].likes || 0;
+            microbes[existingIndex] = newMicrobe;
+        } else {
+            newMicrobe.likes = 0; // Initialize new microbe with 0 likes
+            microbes.push(newMicrobe);
+            // Sort by date descending
+            microbes.sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
 
-    await writeData(microbes);
-    res.status(201).json(newMicrobe);
+        await writeData(microbes);
+        res.status(201).json(newMicrobe);
+    } catch (error) {
+        console.error('Error saving microbe:', error);
+        res.status(500).json({ message: 'Error saving to backend', error: error.message });
+    }
 });
 
 // DELETE a microbe
@@ -107,7 +120,7 @@ app.post('/api/like', async (req, res) => {
 });
 
 // Catch-all to serve React's index.html for any non-API routes
-app.get('*', (req, res) => {
+app.get('*all', (req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
