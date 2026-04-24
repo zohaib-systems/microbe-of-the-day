@@ -172,13 +172,22 @@ function HomePage() {
           fetch('/api/today'),
           fetch('/api/microbes'),
         ])
+        
         const todayData = await todayRes.json()
         const allData = await allRes.json()
-        setCurrentMicrobe(todayData)
-        setAllMicrobes(allData)
+        
+        // Safety check: ensure allData is an array
+        if (Array.isArray(allData)) {
+          setAllMicrobes(allData)
+          setCurrentMicrobe(todayData || allData[0])
+        } else {
+          console.error('Expected array from /api/microbes, got:', allData)
+          setAllMicrobes([])
+          setCurrentMicrobe(null)
+        }
         
         // Check if today's mystery was already solved
-        const wasRevealed = localStorage.getItem(`revealed_${todayData.id}`) === 'true'
+        const wasRevealed = todayData?.id && localStorage.getItem(`revealed_${todayData.id}`) === 'true'
         setIsRevealed(wasRevealed)
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -280,8 +289,10 @@ function HomePage() {
     }
   }
 
-  const currentIndex = allMicrobes.findIndex((m) => m?.id === currentMicrobe?.id)
-  const hasNext = currentIndex < allMicrobes.length - 1
+  const currentIndex = Array.isArray(allMicrobes) 
+    ? allMicrobes.findIndex((m) => m?.id === currentMicrobe?.id)
+    : -1
+  const hasNext = currentIndex !== -1 && currentIndex < allMicrobes.length - 1
   const hasPrev = currentIndex > 0
 
   const launchPulse = (trace) => {
