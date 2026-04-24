@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ADMIN_LOGIN_PATH } from '../config/adminRoute'
 
@@ -6,7 +6,7 @@ function AdminPage() {
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
     name: '',
-    date: '',
+    date: new Date().toISOString().split('T')[0],
     imageUrl: '',
     imageData: '',
     history: '',
@@ -16,6 +16,15 @@ function AdminPage() {
   })
 
   const [message, setMessage] = useState('')
+  const [existingDates, setExistingDates] = useState([])
+
+  useEffect(() => {
+    fetch('/api/microbes')
+      .then(res => res.json())
+      .then(data => {
+        setExistingDates(data.map(m => m.date))
+      })
+  }, [])
 
   const updateField = (field, value) => {
     setFormData((current) => ({ ...current, [field]: value }))
@@ -37,7 +46,7 @@ function AdminPage() {
     reader.readAsDataURL(file)
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
 
     if (!formData.name.trim() || !formData.date) {
@@ -52,7 +61,36 @@ function AdminPage() {
       return
     }
 
-    setMessage(`Saved microbe for ${formData.date}. The data is now available to all users.`)
+    try {
+      const response = await fetch('/api/microbes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          imageUrl: image, // Use the uploaded image data or URL
+        }),
+      })
+
+      if (response.ok) {
+        setMessage(`Saved microbe for ${formData.date}.`)
+        setFormData({
+          name: '',
+          date: new Date().toISOString().split('T')[0],
+          imageUrl: '',
+          imageData: '',
+          history: '',
+          pathogenesis: '',
+          biotech: '',
+          industrial: '',
+        })
+      } else {
+        setMessage('Failed to save microbe to backend.')
+      }
+    } catch (error) {
+      setMessage('Error connecting to backend.')
+    }
   }
 
   const handleLogout = () => {
@@ -69,6 +107,11 @@ function AdminPage() {
             <h1 className="mt-1 text-2xl font-semibold tracking-tight">Admin · Daily Microbe</h1>
           </div>
           <div className="flex items-center gap-3 text-sm">
+            {message && message.includes('Saved') && (
+              <Link to="/" className="rounded-lg bg-cyan-500/20 border border-cyan-400/30 px-3 py-1.5 text-cyan-200 transition hover:bg-cyan-500/30">
+                View on Home Page
+              </Link>
+            )}
             <Link to="/" className="rounded-lg border border-white/30 px-3 py-1.5 text-slate-100 transition hover:bg-white/10">
               Go to main page
             </Link>
@@ -93,12 +136,17 @@ function AdminPage() {
             value={formData.name}
             onChange={(event) => updateField('name', event.target.value)}
           />
-          <input
-            type="date"
-            className="rounded-xl border border-white/20 bg-slate-900/75 px-3 py-2.5 outline-none transition focus:border-cyan-300"
-            value={formData.date}
-            onChange={(event) => updateField('date', event.target.value)}
-          />
+          <div className="flex flex-col gap-1">
+            <input
+              type="date"
+              className="w-full rounded-xl border border-white/20 bg-slate-900/75 px-3 py-2.5 outline-none transition focus:border-cyan-300 [color-scheme:dark]"
+              value={formData.date}
+              onChange={(event) => updateField('date', event.target.value)}
+            />
+            {existingDates.includes(formData.date) && (
+              <p className="text-[10px] text-amber-400 px-1">Note: This date already has an entry. Saving will overwrite it.</p>
+            )}
+          </div>
           <input
             className="sm:col-span-2 rounded-xl border border-white/20 bg-slate-900/75 px-3 py-2.5 outline-none transition focus:border-cyan-300"
             placeholder="Image URL (https://...)"

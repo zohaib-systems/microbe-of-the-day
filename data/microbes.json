@@ -1,0 +1,25 @@
+[
+  {
+    "id": "1777005571187",
+    "name": "E coli",
+    "date": "2026-04-24",
+    "imageUrl": "https://cdn.britannica.com/87/141087-050-24850517/H7-number-Escherichia-coli-bacteria-O157.jpg",
+    "imageData": "",
+    "history": "History",
+    "pathogenesis": "Pathogenesis",
+    "biotech": "Biotech Importance",
+    "industrial": "Industrial",
+    "likes": 14
+  },
+  {
+    "id": "1",
+    "name": "Deinococcus radiodurans",
+    "date": "2026-04-23",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e0/Deinococcus_radiodurans.jpg",
+    "history": "First isolated in 1956 during food irradiation studies, this bacterium became iconic for surviving extreme DNA-damaging conditions.",
+    "pathogenesis": "It is generally non-pathogenic and is mainly studied as a model for stress tolerance, DNA repair, and cellular resilience.",
+    "biotech": "Used in bioremediation research where engineered strains can help process radioactive waste environments safely.",
+    "industrial": "Its robust enzymes inspire industrial process design for high-stress manufacturing and advanced bio-based systems.",
+    "likes": 0
+  }
+]
