@@ -169,7 +169,7 @@ function HomePage() {
     const fetchData = async () => {
       try {
         const [todayRes, allRes] = await Promise.all([
-          fetch('/api/microbes/today'),
+          fetch('/api/today'),
           fetch('/api/microbes'),
         ])
         const todayData = await todayRes.json()
@@ -231,7 +231,7 @@ function HomePage() {
     if (!window.confirm('Are you sure you want to delete this microbe from history?')) return
 
     try {
-      const response = await fetch(`/api/microbes/${id}`, {
+      const response = await fetch(`/api/delete?id=${id}`, {
         method: 'DELETE',
       })
       if (response.ok) {
@@ -250,7 +250,7 @@ function HomePage() {
   const handleLike = async (id) => {
     const stringId = String(id)
     try {
-      const response = await fetch(`/api/microbes/${stringId}/like`, {
+      const response = await fetch(`/api/like?id=${stringId}`, {
         method: 'POST',
       })
       if (response.ok) {

@@ -40,7 +40,7 @@ app.get('/api/microbes', async (req, res) => {
 });
 
 // GET today's microbe
-app.get('/api/microbes/today', async (req, res) => {
+app.get('/api/today', async (req, res) => {
     const date = req.query.date || new Date().toISOString().split('T')[0];
     const microbes = await readData();
     const microbe = microbes.find(m => m.date === date);
@@ -78,10 +78,10 @@ app.post('/api/microbes', async (req, res) => {
 });
 
 // DELETE a microbe
-app.delete('/api/microbes/:id', async (req, res) => {
-    const { id } = req.params;
+app.delete('/api/delete', async (req, res) => {
+    const { id } = req.query;
     const microbes = await readData();
-    const filteredMicrobes = microbes.filter(m => m.id !== id);
+    const filteredMicrobes = microbes.filter(m => String(m.id) !== String(id));
     
     if (microbes.length === filteredMicrobes.length) {
         return res.status(404).json({ message: 'Microbe not found' });
@@ -92,19 +92,16 @@ app.delete('/api/microbes/:id', async (req, res) => {
 });
 
 // LIKE a microbe
-app.post('/api/microbes/:id/like', async (req, res) => {
-    const { id } = req.params;
-    console.log(`Liking microbe with ID: ${id}`);
+app.post('/api/like', async (req, res) => {
+    const { id } = req.query;
     const microbes = await readData();
-    const microbe = microbes.find(m => m.id === id);
+    const microbe = microbes.find(m => String(m.id) === String(id));
     
     if (!microbe) {
-        console.log(`Microbe with ID ${id} not found.`);
         return res.status(404).json({ message: 'Microbe not found' });
     }
 
     microbe.likes = (microbe.likes || 0) + 1;
-    console.log(`New likes for ${microbe.name}: ${microbe.likes}`);
     await writeData(microbes);
     res.json(microbe);
 });
